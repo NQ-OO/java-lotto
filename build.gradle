@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'jacoco'
+    id "org.sonarqube" version "5.0.0.4638"
 }
 
 version '1.0-SNAPSHOT'
@@ -21,4 +23,57 @@ java {
 
 test {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
+
+jacoco {
+    toolVersion = "0.8.5";
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+    }
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'BUNDLE'
+
+            limit {
+                counter = 'METHOD'
+                value = 'COVEREDRATIO'
+                minimum = 0.10
+            }
+
+            excludes = [
+                    '*.controller.*',
+//                    '*.view.*',
+//                    '*.WinningLotto'
+            ]
+        }
+    }
+}
+
+sonar {
+    properties {
+        property "sonar.projectKey", "USER"
+        property "sonar.projectName", "USER"
+    }
+}
+
+//task testCoverage(type: Test) {
+//    group 'verification'
+//    description 'Runs the unit tests with coverage'
+//
+//    dependsOn(':test',
+//            ':jacocoTestReport',
+//            ':jacocoTestCoverageVerification')
+//
+//    tasks['jacocoTestReport'].mustRunAfter(tasks['test'])
+//    tasks['jacocoTestCoverageVerification'].mustRunAfter(tasks['jacocoTestReport'])
+//}
